@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>medium_images Docs</title>
+  <title>Project Docs</title>
   <style>
     :root {
       color-scheme: light;
@@ -129,7 +129,7 @@
   <main>
     <section class="hero">
       <p class="eyebrow">GitHub Pages</p>
-      <h1>medium_images Docs</h1>
+      <h1>Project Docs</h1>
       <p class="intro">This landing page gives readers two entry points for the article: a rendered static HTML version hosted on GitHub Pages, and the original Markdown source hosted in the GitHub repository.</p>
 
       <div class="grid">
@@ -142,12 +142,33 @@
         <article class="card">
           <h2>Read the Markdown source</h2>
           <p>Open the canonical Markdown document on GitHub with standard GitHub Markdown rendering.</p>
-          <a class="link" href="https://github.com/vrsarin/medium_images/blob/main/docs/tokens-are-not-free.md">Open Markdown on GitHub</a>
+          <a class="link" id="markdown-link" href="#">Open Markdown on GitHub</a>
         </article>
       </div>
 
-      <p class="note">Why link Markdown on GitHub instead of <code>tokens-are-not-free.md</code> on Pages: GitHub Pages serves static files, while GitHub repository pages provide the familiar rendered Markdown view.</p>
+      <p class="note" id="markdown-note">Why link Markdown on GitHub instead of <code>tokens-are-not-free.md</code> on Pages: GitHub Pages serves static files, while GitHub repository pages provide the familiar rendered Markdown view.</p>
     </section>
   </main>
+  <script>
+    (function () {
+      var markdownLink = document.getElementById("markdown-link");
+      var markdownNote = document.getElementById("markdown-note");
+      var host = window.location.hostname;
+      var pathParts = window.location.pathname.split("/").filter(Boolean);
+
+      if (!host.endsWith("github.io") || pathParts.length === 0) {
+        markdownLink.href = "../docs/tokens-are-not-free.md";
+        markdownLink.setAttribute("target", "_blank");
+        markdownNote.textContent = "Local preview detected. The Markdown GitHub link is generated automatically when this site is hosted on GitHub Pages.";
+        return;
+      }
+
+      var owner = host.split(".")[0];
+      var repo = pathParts[0];
+      markdownLink.href = "https://github.com/" + owner + "/" + repo + "/blob/main/docs/tokens-are-not-free.md";
+      markdownLink.setAttribute("target", "_blank");
+      markdownLink.setAttribute("rel", "noreferrer noopener");
+    }());
+  </script>
 </body>
 </html>
