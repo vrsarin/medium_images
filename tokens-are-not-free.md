@@ -1,3 +1,8 @@
+---
+layout: default
+permalink: /
+---
+
 # Tokens Are Not Free: How Every Token Generated Drives Real Operating Cost
 
 ## Introduction
@@ -37,7 +42,7 @@ That distinction matters for cost accounting because the model processes those t
 
 ## How a Transformer Generates Tokens
 
-Modern language models — GPT, Gemma, Mistral, Claude — are built on the transformer architecture. To understand why tokens drive cost, you need a basic mental model of what happens inside the network each time it produces one. Representative sources for the mechanics discussed in this section are listed in the source notes at the end.[1][2]
+Modern language models — GPT, Gemma, Mistral, Claude — are built on the transformer architecture. To understand why tokens drive cost, you need a basic mental model of what happens inside the network each time it produces one. Representative sources for the mechanics discussed in this section are listed in the source notes at the end (see sources 1 and 2).
 
 ### The Forward Pass
 
@@ -69,7 +74,7 @@ However, the KV cache is not free. Its memory footprint scales with the number o
 
 ## How Tokens Become OPEX
 
-On a cloud API, the cost model is explicit: you are billed per million input tokens and per million output tokens, with output often carrying a rate two to five times higher than input. The invoice is visible, line-itemed, and attributable.[3][4]
+On a cloud API, the cost model is explicit: you are billed per million input tokens and per million output tokens, with output often carrying a rate two to five times higher than input. The invoice is visible, line-itemed, and attributable (see sources 3 and 4).
 
 On local GPU hardware, the cost model has the same underlying driver but is expressed in different units. There is no invoice from a vendor. Instead, the cost appears as electricity consumption, cooling load, and hardware wear — all driven by how much inference work the GPU performs, which in practice is strongly influenced by prompt length, output length, model size, batching, and throughput.
 
@@ -79,9 +84,9 @@ GPU power draw is not constant. Under idle conditions, an inference GPU like a T
 
 During prefill, the GPU may run at high utilization for a short burst. During decode, each sequential forward pass sustains meaningful load for its duration. The total energy consumed per response is therefore a function of both prefill time and decode time, multiplied by the system's average power draw under that workload.
 
-```math
-Electricity cost per call ≈ (prefill_time + decode_time) × (avg_GPU_watts / 1000) × price_per_kWh
-```
+$$
+Electricity\ cost\ per\ call \approx (prefill\_time + decode\_time) \times \left(\frac{avg\_GPU\_watts}{1000}\right) \times price\_per\_kWh
+$$
 
 At fifty decode tokens per second on a 250-watt GPU and $0.12 per kilowatt-hour, a five-hundred-token response with roughly ten seconds of decode time costs about $0.00008 in electricity before adding prefill and cooling overhead. That figure appears negligible in isolation. Across ten thousand calls per day, even a small per-call energy cost becomes a visible operating expense.
 
@@ -115,63 +120,63 @@ Without per-token cost accounting on local infrastructure, the electricity and c
 
 The unified cost formula that closes the TCO model requires token measurement at every layer:
 
-```math
+$$
 \begin{aligned}
 Cloud\ OPEX &= \left(\frac{input\_tokens}{10^6} \times input\_rate\right) + \left(\frac{output\_tokens}{10^6} \times output\_rate\right) \\
 Local\ OPEX &\approx (prefill\_time + decode\_time) \times \left(\frac{avg\_system\_watts}{1000}\right) \times \$/kWh + cooling\_overhead + hardware\_amortization \\
 Total\ TCO &= CapEx\ (hardware) + \sum Local\ OPEX + \sum Cloud\ OPEX + Staff + Facilities
 \end{aligned}
-```
+$$
 
 The local OPEX row is heavily influenced by token-driven workload characteristics even though tokens are not the only parameter. Removing token measurement from this model does not simplify the accounting; it leaves one of the main demand signals unmeasured.
 
 ## If You Run the Model on AWS Instead
 
-Self-hosting an LLM on AWS changes the accounting, but not the underlying logic. You are still paying for inference work. The difference is that electricity, cooling, and most hardware lifecycle costs are embedded in the cloud bill instead of appearing as separate local operating expenses. For a self-managed deployment on Amazon EC2, the cost model is usually built from five parts: compute instance time, attached storage, networking, load balancing, and observability or platform overhead.[6][7][8]
+Self-hosting an LLM on AWS changes the accounting, but not the underlying logic. You are still paying for inference work. The difference is that electricity, cooling, and most hardware lifecycle costs are embedded in the cloud bill instead of appearing as separate local operating expenses. For a self-managed deployment on Amazon EC2, the cost model is usually built from five parts: compute instance time, attached storage, networking, load balancing, and observability or platform overhead (see sources 6, 7, and 8).
 
 A practical monthly formula looks like this:
 
-```math
-AWS self-hosted LLM cost
+$$
+AWS\ self\text{-}hosted\ LLM\ cost
 \approx (EC2\ instance\ hours \times instance\ rate)
 + (EBS\ GB\text{-}month \times storage\ rate)
 + (extra\ EBS\ IOPS/throughput\ charges)
 + (load\ balancer\ hours + LCU/NLCU\ usage)
 + (data\ transfer\ out\ to\ internet)
 + (public\ IPv4,\ snapshots,\ monitoring,\ and\ other\ service\ charges)
-```
+$$
 
 If you want a per-call estimate, divide the monthly infrastructure cost by the number of calls actually served, or better, allocate it by consumed GPU-seconds and token volume:
 
-```math
+$$
 Per\ call\ AWS\ cost
 \approx \frac{monthly\ infrastructure\ cost}{monthly\ calls}
 \quad or \quad
 \frac{request\ GPU\ time}{total\ billable\ GPU\ time} \times monthly\ infrastructure\ cost
-```
+$$
 
-In practice, the dominant term is usually the GPU instance itself. EC2 On-Demand pricing is billed per instance-second or instance-hour depending on the platform, and that compute charge replaces the explicit electricity equation used for on-prem hardware.[6] EBS then adds storage charges, and for some volume types may also add separate charges for provisioned IOPS and throughput.[7] If you front the service with an Application Load Balancer or Network Load Balancer, you pay both for running hours and for usage units such as LCUs or NLCUs.[8] If responses leave AWS and go to users over the public internet, data transfer out can become material at scale.[6]
+In practice, the dominant term is usually the GPU instance itself. EC2 On-Demand pricing is billed per instance-second or instance-hour depending on the platform, and that compute charge replaces the explicit electricity equation used for on-prem hardware (see source 6). EBS then adds storage charges, and for some volume types may also add separate charges for provisioned IOPS and throughput (see source 7). If you front the service with an Application Load Balancer or Network Load Balancer, you pay both for running hours and for usage units such as LCUs or NLCUs (see source 8). If responses leave AWS and go to users over the public internet, data transfer out can become material at scale (see source 6).
 
 The conceptual bridge back to token accounting is straightforward. On AWS, tokens still drive the amount of inference work your system performs. More prompt tokens increase prefill work. More generated tokens increase decode time. Those factors reduce effective throughput, increase required instance hours, and therefore raise the EC2 portion of the bill. So even in AWS, the infrastructure bill is not separate from token economics. It is simply a different ledger expression of the same workload.
 
 ## Distributed Inference and the Networking Penalty
 
-Once a model no longer fits comfortably on one device, inference stops being only a compute-and-memory problem and becomes a networking problem as well. Tensor parallelism, pipeline parallelism, and other distributed inference strategies split work across multiple GPUs or nodes, which means intermediate activations, partial results, or KV-related state must be exchanged across the interconnect.[10]
+Once a model no longer fits comfortably on one device, inference stops being only a compute-and-memory problem and becomes a networking problem as well. Tensor parallelism, pipeline parallelism, and other distributed inference strategies split work across multiple GPUs or nodes, which means intermediate activations, partial results, or KV-related state must be exchanged across the interconnect (see source 10).
 
 That matters economically because distributed inference adds a new OPEX term that does not exist in the same way for a single-card deployment:
 
-```math
+$$
 Distributed\ inference\ OPEX
 \approx compute
 + storage
 + interconnect\ and\ east\text{-}west\ networking
 + synchronization\ overhead
 + underutilization\ caused\ by\ communication\ stalls
-```
+$$
 
 In practical deployments, the networking cost can rise very sharply as the model is spread across more devices. The reason is not that networking is universally exponential in a strict mathematical sense. It is that each scaling step can increase traffic between devices, force a move to a higher-bandwidth fabric, and reduce effective utilization if the interconnect is too slow. Operationally, that can look exponential because the spend curve steepens quickly once you cross the boundary from single-node inference to multi-node coordination.
 
-Tensor parallelism is a concrete example. When a layer is sharded across GPUs, partial outputs must be transferred and recombined to produce the final result.[10] On a single machine, this may be handled by NVLink, PCIe, or another high-speed local fabric. Across machines, the same pattern may traverse much more expensive east-west networking, where both latency and bandwidth become limiting factors. In cloud environments, this can also introduce explicit transfer charges or force the use of more expensive instance classes and network topologies.[6]
+Tensor parallelism is a concrete example. When a layer is sharded across GPUs, partial outputs must be transferred and recombined to produce the final result (see source 10). On a single machine, this may be handled by NVLink, PCIe, or another high-speed local fabric. Across machines, the same pattern may traverse much more expensive east-west networking, where both latency and bandwidth become limiting factors. In cloud environments, this can also introduce explicit transfer charges or force the use of more expensive instance classes and network topologies (see source 6).
 
 The cost impact shows up in three ways:
 
@@ -183,20 +188,20 @@ So distributed inference does not break the token-cost thesis; it reinforces it.
 
 ## Where Amazon Bedrock Fits
 
-Amazon Bedrock sits in a different part of the stack from self-hosting on EC2. With EC2, you rent infrastructure and run the model yourself. With Bedrock, AWS exposes managed foundation models as an API service. That means the cost model looks much closer to OpenAI or Anthropic API billing than to operating your own inference fleet.[9]
+Amazon Bedrock sits in a different part of the stack from self-hosting on EC2. With EC2, you rent infrastructure and run the model yourself. With Bedrock, AWS exposes managed foundation models as an API service. That means the cost model looks much closer to OpenAI or Anthropic API billing than to operating your own inference fleet (see source 9).
 
 For standard on-demand text inference, the practical Bedrock formula is usually:
 
-```math
+$$
 Bedrock\ on\text{-}demand\ cost
 \approx (input\ tokens \times input\ rate)
 + (output\ tokens \times output\ rate)
 + optional\ Bedrock\ add\text{-}ons
-```
+$$
 
-Those add-ons can matter. Depending on the architecture, the total bill may also include Bedrock Guardrails, Knowledge Bases, Flows, model evaluation, prompt optimization, batch inference, or other Bedrock-managed features.[9] In other words, Bedrock often preserves token-based charging for the model invocation itself, while separately charging for orchestration or safety features wrapped around it.
+Those add-ons can matter. Depending on the architecture, the total bill may also include Bedrock Guardrails, Knowledge Bases, Flows, model evaluation, prompt optimization, batch inference, or other Bedrock-managed features (see source 9). In other words, Bedrock often preserves token-based charging for the model invocation itself, while separately charging for orchestration or safety features wrapped around it.
 
-Bedrock also supports pricing modes beyond simple on-demand token billing. Some models support provisioned throughput, where you reserve model capacity and pay for committed model units over time. In that case, the cost model starts to look more like reserved serving capacity than pure per-token API billing. Bedrock also offers batch inference for some models at lower prices than standard on-demand usage.[9]
+Bedrock also supports pricing modes beyond simple on-demand token billing. Some models support provisioned throughput, where you reserve model capacity and pay for committed model units over time. In that case, the cost model starts to look more like reserved serving capacity than pure per-token API billing. Bedrock also offers batch inference for some models at lower prices than standard on-demand usage (see source 9).
 
 The practical distinction is this:
 
@@ -230,13 +235,13 @@ For the last row in particular, distributed inference on a 7× P40 system only w
 
 ## Source Notes
 
-1. Vaswani et al., _Attention Is All You Need_ (2017). Canonical reference for the transformer architecture and the role of self-attention: https://arxiv.org/abs/1706.03762
-2. Hugging Face Transformers documentation, _Caching_. Practical explanation of KV caching during autoregressive inference, including cache structure and why caching avoids recomputing prior keys and values: https://huggingface.co/docs/transformers/main/cache_explanation
-3. OpenAI API Pricing. Current example of distinct input-token and output-token pricing on a major commercial API: https://openai.com/api/pricing/
-4. Claude API Pricing. Another current example of distinct input-token and output-token pricing on a major commercial API: https://claude.com/pricing#api
-5. Hardware figures in this article are illustrative rather than normative. Power draw, memory usage, and throughput vary by GPU model, board design, quantization level, batch size, context length, and serving stack. For telemetry and validation, see NVIDIA's `nvidia-smi` documentation: https://docs.nvidia.com/deploy/nvidia-smi/index.html. For an example of how serving-stack choices and KV-cache behavior materially affect long-context throughput, see Hugging Face Text Generation Inference v3 overview: https://huggingface.co/docs/text-generation-inference/en/conceptual/chunking
-6. Amazon EC2 On-Demand Pricing. Reference for instance-hour pricing, billing model, and data transfer pricing: https://aws.amazon.com/ec2/pricing/on-demand/
-7. Amazon EBS Pricing. Reference for EBS storage pricing and the separate pricing dimensions for provisioned IOPS and throughput on some volume types: https://aws.amazon.com/ebs/pricing/
-8. Elastic Load Balancing Pricing. Reference for hourly load balancer charges and LCU or NLCU usage-based pricing: https://aws.amazon.com/elasticloadbalancing/pricing/
-9. Amazon Bedrock Pricing. Reference for on-demand model pricing, provisioned throughput, batch inference, Guardrails, Knowledge Bases, and other managed Bedrock charges: https://aws.amazon.com/bedrock/pricing/
-10. Hugging Face Text Generation Inference documentation, _Tensor Parallelism_. Reference for how model layers are split across GPUs and why partial outputs must be transferred and recombined during distributed inference: https://huggingface.co/docs/text-generation-inference/en/conceptual/tensor_parallelism
+1. Vaswani et al., _Attention Is All You Need_ (2017). Canonical reference for the transformer architecture and the role of self-attention: <https://arxiv.org/abs/1706.03762>
+2. Hugging Face Transformers documentation, _Caching_. Practical explanation of KV caching during autoregressive inference, including cache structure and why caching avoids recomputing prior keys and values: <https://huggingface.co/docs/transformers/main/cache_explanation>
+3. OpenAI API Pricing. Current example of distinct input-token and output-token pricing on a major commercial API: <https://openai.com/api/pricing/>
+4. Claude API Pricing. Another current example of distinct input-token and output-token pricing on a major commercial API: <https://claude.com/pricing#api>
+5. Hardware figures in this article are illustrative rather than normative. Power draw, memory usage, and throughput vary by GPU model, board design, quantization level, batch size, context length, and serving stack. For telemetry and validation, see NVIDIA's `nvidia-smi` documentation: <https://docs.nvidia.com/deploy/nvidia-smi/index.html>. For an example of how serving-stack choices and KV-cache behavior materially affect long-context throughput, see Hugging Face Text Generation Inference v3 overview: <https://huggingface.co/docs/text-generation-inference/en/conceptual/chunking>
+6. Amazon EC2 On-Demand Pricing. Reference for instance-hour pricing, billing model, and data transfer pricing: <https://aws.amazon.com/ec2/pricing/on-demand/>
+7. Amazon EBS Pricing. Reference for EBS storage pricing and the separate pricing dimensions for provisioned IOPS and throughput on some volume types: <https://aws.amazon.com/ebs/pricing/>
+8. Elastic Load Balancing Pricing. Reference for hourly load balancer charges and LCU or NLCU usage-based pricing: <https://aws.amazon.com/elasticloadbalancing/pricing/>
+9. Amazon Bedrock Pricing. Reference for on-demand model pricing, provisioned throughput, batch inference, Guardrails, Knowledge Bases, and other managed Bedrock charges: <https://aws.amazon.com/bedrock/pricing/>
+10. Hugging Face Text Generation Inference documentation, _Tensor Parallelism_. Reference for how model layers are split across GPUs and why partial outputs must be transferred and recombined during distributed inference: <https://huggingface.co/docs/text-generation-inference/en/conceptual/tensor_parallelism>
