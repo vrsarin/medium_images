@@ -1,9 +1,3 @@
----
-layout: default
-title: Tokens Are Not Free
-permalink: /tokens-are-not-free.html
----
-
 # Tokens Are Not Free: How Every Token Generated Drives Real Operating Cost
 
 ## Introduction
