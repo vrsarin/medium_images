@@ -18,7 +18,7 @@ open:
 start: serve open
 
 pip-install:
-	pip install -r requirements.txt
+	uv sync
 
 embeddings:
-	python generate_embeddings.py
+	uv run generate_embeddings.py
