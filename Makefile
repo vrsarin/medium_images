@@ -1,4 +1,4 @@
-.PHONY: install serve build clean open start
+.PHONY: install serve build clean open start embeddings pip-install
 
 install:
 	bundle install
@@ -16,3 +16,9 @@ open:
 	start http://localhost:4000
 
 start: serve open
+
+pip-install:
+	pip install -r requirements.txt
+
+embeddings:
+	python generate_embeddings.py

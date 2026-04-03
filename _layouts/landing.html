@@ -562,37 +562,156 @@
         card.querySelector('.book-progress-fill').style.width = Math.min(pct, 100) + '%';
     });
 
-    // ── Search ──
+    // ── Semantic KNN search ──
     const searchInput  = document.getElementById('lib-search');
     const searchClear  = document.getElementById('search-clear');
     const searchStatus = document.getElementById('search-status');
     const shelfLabel   = document.getElementById('shelf-label');
     const noResults    = document.getElementById('no-results');
     const cards        = document.querySelectorAll('.book-card');
+    const grid         = document.querySelector('.book-grid');
 
-    function runSearch() {
-      const q = searchInput.value.trim().toLowerCase();
-      searchClear.classList.toggle('visible', q.length > 0);
+    // Preserve original DOM order for reset
+    const originalOrder = [...cards];
 
+    // Pre-computed embeddings from generate_embeddings.py
+    let searchIndex     = null;
+    let embedExtractor  = null;
+    let extractorState  = 'idle'; // idle | loading | ready | failed
+    let pendingToken    = null;
+
+    // Fetch the search index (built by generate_embeddings.py)
+    fetch('{{ site.baseurl }}/assets/search-index.json')
+      .then(r => r.json())
+      .then(data => { searchIndex = data; })
+      .catch(() => { /* no index yet — keyword search only */ });
+
+    // Dot product of two L2-normalised vectors = cosine similarity
+    function cosineSim(a, b) {
+      let dot = 0;
+      for (let i = 0; i < a.length; i++) dot += a[i] * b[i];
+      return dot;
+    }
+
+    // Lazy-load Transformers.js + model on first use
+    async function getExtractor() {
+      if (embedExtractor)          return embedExtractor;
+      if (extractorState === 'loading') return null; // already in flight
+      if (extractorState === 'failed')  return null;
+      extractorState = 'loading';
+      try {
+        const { pipeline, env } = await import(
+          'https://cdn.jsdelivr.net/npm/@xenova/transformers@2/dist/transformers.min.js'
+        );
+        env.allowLocalModels = false;
+        embedExtractor = await pipeline(
+          'feature-extraction', 'Xenova/all-MiniLM-L6-v2', { quantized: true }
+        );
+        extractorState = 'ready';
+        return embedExtractor;
+      } catch (_) {
+        extractorState = 'failed';
+        return null;
+      }
+    }
+
+    // Embed query and return top-K nearest neighbours (score > threshold)
+    async function knnSearch(query, k = 10, threshold = 0.25) {
+      const extractor = await getExtractor();
+      if (!extractor || !searchIndex) return null;
+      const out      = await extractor(query, { pooling: 'mean', normalize: true });
+      const queryVec = Array.from(out.data);
+      return searchIndex
+        .map(item => ({ url: item.url, score: cosineSim(queryVec, item.embedding) }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, k)
+        .filter(r => r.score > threshold);
+    }
+
+    // ── DOM helpers ──────────────────────────────────────────────────────
+
+    function keywordFilter(ql) {
       let visible = 0;
       cards.forEach(card => {
         const title = (card.querySelector('.cover-title')?.textContent || '').toLowerCase();
         const desc  = (card.querySelector('.book-desc')?.textContent  || '').toLowerCase();
-        const match = !q || title.includes(q) || desc.includes(q);
+        const match = title.includes(ql) || desc.includes(ql);
         card.style.display = match ? '' : 'none';
         if (match) visible++;
       });
+      return visible;
+    }
 
-      noResults.classList.toggle('show', visible === 0 && q.length > 0);
+    function applySemanticOrder(results) {
+      const ranks = new Map(results.map((r, i) => [r.url, i]));
+      const sorted = [...cards].map(c => ({
+        el: c, rank: ranks.has(c.dataset.url) ? ranks.get(c.dataset.url) : Infinity,
+      })).sort((a, b) => a.rank - b.rank);
+      sorted.forEach(({ el, rank }) => {
+        el.style.display = rank === Infinity ? 'none' : '';
+        grid.appendChild(el); // re-append in score order
+      });
+      return results.length;
+    }
 
-      if (q) {
-        shelfLabel.textContent = visible + ' title' + (visible !== 1 ? 's' : '') + ' found';
-        searchStatus.textContent = 'Searching for "' + searchInput.value.trim() + '"';
-        searchStatus.classList.toggle('no-match', visible === 0);
-      } else {
+    function restoreOrder() {
+      originalOrder.forEach(c => { c.style.display = ''; grid.appendChild(c); });
+    }
+
+    function setStatus(text, isWarning = false) {
+      searchStatus.textContent = text;
+      searchStatus.classList.toggle('no-match', isWarning);
+    }
+
+    // ── Main search handler ───────────────────────────────────────────────
+
+    async function runSearch() {
+      const q  = searchInput.value.trim();
+      const ql = q.toLowerCase();
+      searchClear.classList.toggle('visible', q.length > 0);
+
+      if (!q) {
+        restoreOrder();
+        noResults.classList.remove('show');
         shelfLabel.textContent = 'All Titles';
-        searchStatus.textContent = '';
-        searchStatus.classList.remove('no-match');
+        setStatus('');
+        return;
+      }
+
+      // Phase 1: instant keyword results
+      const kwCount = keywordFilter(ql);
+      noResults.classList.toggle('show', kwCount === 0);
+      shelfLabel.textContent = kwCount + ' title' + (kwCount !== 1 ? 's' : '') + ' found';
+
+      if (!searchIndex) {
+        // No index built yet — stay on keyword results
+        setStatus('Keyword search  ·  run generate_embeddings.py for AI search', kwCount === 0);
+        return;
+      }
+
+      setStatus(extractorState === 'ready' ? '⏳ Searching…' : '⏳ Loading AI model…');
+
+      // Preload model in parallel while keyword results are shown
+      if (extractorState === 'idle') getExtractor();
+
+      // Unique token so a newer keystroke can cancel this one
+      const token = Symbol();
+      pendingToken = token;
+
+      const results = await knnSearch(q);
+      if (pendingToken !== token) return; // superseded
+
+      if (results && results.length > 0) {
+        const count = applySemanticOrder(results);
+        noResults.classList.toggle('show', count === 0);
+        shelfLabel.textContent = count + ' title' + (count !== 1 ? 's' : '') + ' found';
+        setStatus('✦ AI semantic search');
+      } else if (results !== null) {
+        // Model ran but found nothing above threshold — show keyword results
+        setStatus(kwCount === 0 ? 'No results found' : 'Keyword search', kwCount === 0);
+      } else {
+        // Model unavailable — keyword results already displayed
+        setStatus(kwCount === 0 ? 'No results found' : 'Keyword search', kwCount === 0);
       }
     }
 
