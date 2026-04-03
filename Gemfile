@@ -1,5 +1,8 @@
 source "https://rubygems.org"
 
-gem "github-pages", group: :jekyll_plugins
-gem "jekyll-remote-theme", group: :jekyll_plugins
-gem "webrick", "~> 1.8"
+gem "jekyll"
+gem "liquid"
+gem "jekyll-feed", group: :jekyll_plugins
+gem "webrick"
+gem "csv"
+gem "bigdecimal"

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="official">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library — {{ site.title }}</title>
+  <meta name="description" content="{{ site.description }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,600;1,7..72,400&family=Lora:ital,wght@0,400;0,600;1,400&family=Merriweather:ital,wght@0,300;0,400;1,400&family=Playfair+Display:wght@700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Theme variables ─────────────────────────────
+       Mirrors the four reader themes exactly
+    ──────────────────────────────────────────────── */
+    [data-theme="official"] {
+      --bg:          #0f1b2d;
+      --chrome-bg:   rgba(15,27,45,0.96);
+      --surface:     #162435;
+      --ink:         #faf7f2;
+      --ink-sub:     rgba(250,247,242,0.35);
+      --ink-faint:   rgba(250,247,242,0.15);
+      --amber:       #c8780a;
+      --amber-faint: rgba(200,120,10,0.18);
+      --rule:        rgba(200,120,10,0.18);
+      --font-body:   'Literata', Georgia, serif;
+    }
+    [data-theme="sepia"] {
+      --bg:          #f4ede0;
+      --chrome-bg:   rgba(232,221,208,0.96);
+      --surface:     #ede4d4;
+      --ink:         #2c1f0e;
+      --ink-sub:     rgba(44,31,14,0.45);
+      --ink-faint:   rgba(44,31,14,0.14);
+      --amber:       #8b4513;
+      --amber-faint: rgba(139,69,19,0.15);
+      --rule:        rgba(139,69,19,0.2);
+      --font-body:   'Literata', Georgia, serif;
+    }
+    [data-theme="day"] {
+      --bg:          #ffffff;
+      --chrome-bg:   rgba(240,240,240,0.96);
+      --surface:     #f5f5f5;
+      --ink:         #1a1a1a;
+      --ink-sub:     rgba(26,26,26,0.45);
+      --ink-faint:   rgba(26,26,26,0.1);
+      --amber:       #0f1b2d;
+      --amber-faint: rgba(15,27,45,0.08);
+      --rule:        rgba(26,26,26,0.1);
+      --font-body:   'Literata', Georgia, serif;
+    }
+    [data-theme="night"] {
+      --bg:          #1a1410;
+      --chrome-bg:   rgba(20,16,12,0.96);
+      --surface:     #221c18;
+      --ink:         #d4c9b8;
+      --ink-sub:     rgba(212,201,184,0.4);
+      --ink-faint:   rgba(212,201,184,0.12);
+      --amber:       #c8a060;
+      --amber-faint: rgba(200,160,96,0.12);
+      --rule:        rgba(200,160,96,0.15);
+      --font-body:   'Literata', Georgia, serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      font-family: var(--font-body);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── Top bar ── */
+    .k-bar {
+      position: sticky;
+      top: 0;
+      height: 50px;
+      background: var(--chrome-bg);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 100;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .k-logo {
+      font-family: 'Literata', Georgia, serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.01em;
+    }
+    .k-logo em { color: var(--amber); font-style: normal; }
+    .k-bar-tag {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-sub);
+    }
+    .k-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .theme-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: var(--ink-sub);
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 0.28rem 0.55rem;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      line-height: 1;
+    }
+    .theme-btn:hover {
+      color: var(--ink);
+      border-color: var(--rule);
+    }
+    .theme-btn.active {
+      color: var(--amber);
+      border-color: var(--amber);
+      background: var(--amber-faint);
+    }
+
+    /* ── Library header ── */
+    .lib-header {
+      max-width: 90%;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 2rem;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .lib-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 0.65rem;
+    }
+    .lib-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      font-weight: 900;
+      color: var(--ink);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    .lib-count {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      padding-bottom: 0.4rem;
+      white-space: nowrap;
+    }
+
+    /* ── Search ── */
+    .search-wrap {
+      max-width: 90%;
+      margin: 0 auto;
+      padding: 1.75rem 2rem 0;
+    }
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      color: var(--ink-sub);
+      font-size: 1rem;
+      pointer-events: none;
+      line-height: 1;
+    }
+    #lib-search {
+      width: 100%;
+      background: var(--amber-faint);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 0.75rem 2.5rem 0.75rem 2.75rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    #lib-search::placeholder { color: var(--ink-sub); }
+    #lib-search:focus { border-color: var(--amber); }
+    #lib-search::-webkit-search-cancel-button { display: none; }
+    .search-clear {
+      position: absolute;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      color: var(--ink-sub);
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.4rem;
+      border-radius: 3px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s, color 0.15s;
+      line-height: 1;
+    }
+    .search-clear.visible { opacity: 1; pointer-events: auto; }
+    .search-clear:hover { color: var(--ink); }
+    .search-status {
+      margin-top: 0.65rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: var(--ink-faint);
+      min-height: 1.1em;
+    }
+    .search-status.no-match { color: var(--amber); }
+
+    /* ── Shelf ── */
+    .shelf {
+      max-width: 90%;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 7rem;
+    }
+    .shelf-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .shelf-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    /* ── Book grid ── */
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+      gap: 2.5rem 2rem;
+      justify-content: center;
+    }
+
+    /* ── Book card ── */
+    .book-card {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+    }
+    .book-card:hover .book-cover {
+      transform: translateY(-6px) rotate(-0.5deg);
+      box-shadow: -8px 16px 32px rgba(0,0,0,0.5), inset -3px 0 10px rgba(0,0,0,0.2), 0 0 0 1px var(--amber-faint);
+    }
+
+    /* ── Book cover ── */
+    .book-cover {
+      position: relative;
+      aspect-ratio: 2 / 3;
+      border-radius: 2px 6px 6px 2px;
+      overflow: hidden;
+      box-shadow: -4px 6px 14px rgba(0,0,0,0.45), inset -3px 0 8px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.35);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .book-cover::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 10px;
+      background: linear-gradient(to right, rgba(0,0,0,0.45), rgba(0,0,0,0.1) 60%, transparent);
+      z-index: 3;
+    }
+    .book-cover::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(150deg, rgba(255,255,255,0.07) 0%, transparent 45%, rgba(0,0,0,0.12) 100%);
+      z-index: 3;
+    }
+
+    /* Six cover palettes */
+    .cov-1 { background: linear-gradient(150deg, #0a1e30 0%, #0d3352 45%, #b86d08 100%); }
+    .cov-2 { background: linear-gradient(150deg, #28090a 0%, #541414 45%, #c89050 100%); }
+    .cov-3 { background: linear-gradient(150deg, #0a2215 0%, #0f4a28 45%, #c8a040 100%); }
+    .cov-4 { background: linear-gradient(150deg, #160a28 0%, #2a1458 45%, #c0700a 100%); }
+    .cov-5 { background: linear-gradient(150deg, #281608 0%, #503010 45%, #e0c060 100%); }
+    .cov-6 { background: linear-gradient(150deg, #081420 0%, #102038 45%, #7a3408 100%); }
+
+    .cover-body {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      padding: 1.1rem 1rem 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .cover-tag {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.48rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.38);
+    }
+    .cover-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: rgba(255,255,255,0.06);
+      line-height: 1;
+      text-align: right;
+      margin: -0.5rem -0.25rem 0 0;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .cover-title {
+      font-family: 'Literata', Georgia, serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      line-height: 1.4;
+      color: rgba(255,255,255,0.92);
+      text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    }
+    .cover-foot {
+      font-family: 'Inter', sans-serif;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 0.5rem;
+      font-size: 0.52rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ── Below-cover metadata ── */
+    .book-meta {
+      padding: 0.85rem 0.1rem 0;
+    }
+    .book-date {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 0.3rem;
+      opacity: 0.8;
+    }
+    .book-desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      line-height: 1.55;
+      color: var(--ink-sub);
+      font-weight: 300;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .book-progress {
+      margin-top: 0.6rem;
+      height: 2px;
+      background: var(--ink-faint);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+    .book-progress-fill {
+      height: 100%;
+      background: var(--amber);
+      border-radius: 1px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* No-results */
+    .no-results {
+      display: none;
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--ink-sub);
+    }
+    .no-results.show { display: block; }
+    .no-results-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; }
+    .no-results-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Footer ── */
+    .k-footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--rule);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    @media (max-width: 640px) {
+      .book-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 1.25rem; }
+      .lib-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    }
+    @media (max-width: 360px) {
+      .book-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="k-bar">
+    <div class="k-logo">{{ site.title | split: ':' | first | strip }}<em>.</em></div>
+    <div class="k-bar-right">
+      <span class="k-bar-tag">Library&nbsp;&nbsp;</span>
+      <button type="button" class="theme-btn" data-theme="sepia">Sepia</button>
+      <button type="button" class="theme-btn" data-theme="day">Day</button>
+      <button type="button" class="theme-btn" data-theme="night">Night</button>
+      <button type="button" class="theme-btn" data-theme="official">Official</button>
+    </div>
+  </nav>
+
+  {% assign articles = site.pages | where_exp: "p", "p.layout == 'default' and p.title" | sort: "date" | reverse %}
+
+  <header class="lib-header">
+    <div>
+      <div class="lib-eyebrow">Reading Collection</div>
+      <h1 class="lib-title">Library</h1>
+    </div>
+    <div class="lib-count">
+      {{ articles.size }} title{% if articles.size != 1 %}s{% endif %}
+    </div>
+  </header>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <span class="search-icon">&#x2315;</span>
+      <input type="search" id="lib-search" placeholder="Search your library…" autocomplete="off" spellcheck="false">
+      <button type="button" class="search-clear" id="search-clear" aria-label="Clear">✕</button>
+    </div>
+    <div class="search-status" id="search-status"></div>
+  </div>
+
+  <main class="shelf">
+    <div class="shelf-label" id="shelf-label">All Titles</div>
+    <div class="book-grid">
+      {% for article in articles %}
+        {% assign ci = forloop.index | modulo: 6 %}
+        {% if ci == 0 %}{% assign ci = 6 %}{% endif %}
+        <a class="book-card" href="{{ article.url | relative_url }}" data-url="{{ article.url | relative_url }}">
+          <div class="book-cover cov-{{ ci }}">
+            <div class="cover-body">
+              <div class="cover-tag">Technical Analysis</div>
+              <div class="cover-num">{{ forloop.index }}</div>
+              <div>
+                <div class="cover-title">{{ article.title }}</div>
+              </div>
+              <div class="cover-foot">{{ site.title | split: ':' | first | strip }}</div>
+            </div>
+          </div>
+          <div class="book-meta">
+            {% if article.date %}
+            <div class="book-date">{{ article.date | date: "%b %Y" }}</div>
+            {% endif %}
+            {% if article.description %}
+            <div class="book-desc">{{ article.description }}</div>
+            {% endif %}
+            <div class="book-progress">
+              <div class="book-progress-fill"></div>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    <div class="no-results" id="no-results">
+      <div class="no-results-icon">⊘</div>
+      <div class="no-results-text">No titles match your search</div>
+    </div>
+  </main>
+
+  <footer class="k-footer">
+    {{ site.title }} &nbsp;·&nbsp; Personal Library
+  </footer>
+
+  <script>
+    // ── Theme switching ──
+    const themeButtons = document.querySelectorAll('.theme-btn[data-theme]');
+
+    function setTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      themeButtons.forEach(b => b.classList.toggle('active', b.dataset.theme === t));
+      localStorage.setItem('reader-theme', t);
+    }
+
+    themeButtons.forEach(b => b.addEventListener('click', () => setTheme(b.dataset.theme)));
+
+    // Apply saved (or default) theme on load
+    setTheme(localStorage.getItem('reader-theme') || 'official');
+
+    // ── Sync font from reader ──
+    const preloadedFonts = new Set([
+      'Literata','Lora','Merriweather','Playfair Display','Crimson Pro','EB Garamond','Inter',
+    ]);
+    const savedFont = localStorage.getItem('reader-font') || 'Literata';
+
+    function applyFont(name) {
+      const stack = preloadedFonts.has(name) ? `'${name}', Georgia, serif` : `'${name}'`;
+      document.documentElement.style.setProperty('--font-body', stack);
+    }
+
+    if (preloadedFonts.has(savedFont)) {
+      applyFont(savedFont);
+    } else {
+      // Load from Google Fonts on demand then apply
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(savedFont)}:ital,wght@0,400;0,700;1,400&display=swap`;
+      link.onload = () => applyFont(savedFont);
+      link.onerror = () => applyFont('Literata');
+      document.head.appendChild(link);
+    }
+
+    // ── Reading progress from localStorage ──
+    document.querySelectorAll('.book-card[data-url]').forEach(card => {
+      const pct = parseFloat(localStorage.getItem('rp-' + card.dataset.url) || '0');
+      if (pct > 0)
+        card.querySelector('.book-progress-fill').style.width = Math.min(pct, 100) + '%';
+    });
+
+    // ── Search ──
+    const searchInput  = document.getElementById('lib-search');
+    const searchClear  = document.getElementById('search-clear');
+    const searchStatus = document.getElementById('search-status');
+    const shelfLabel   = document.getElementById('shelf-label');
+    const noResults    = document.getElementById('no-results');
+    const cards        = document.querySelectorAll('.book-card');
+
+    function runSearch() {
+      const q = searchInput.value.trim().toLowerCase();
+      searchClear.classList.toggle('visible', q.length > 0);
+
+      let visible = 0;
+      cards.forEach(card => {
+        const title = (card.querySelector('.cover-title')?.textContent || '').toLowerCase();
+        const desc  = (card.querySelector('.book-desc')?.textContent  || '').toLowerCase();
+        const match = !q || title.includes(q) || desc.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+
+      noResults.classList.toggle('show', visible === 0 && q.length > 0);
+
+      if (q) {
+        shelfLabel.textContent = visible + ' title' + (visible !== 1 ? 's' : '') + ' found';
+        searchStatus.textContent = 'Searching for "' + searchInput.value.trim() + '"';
+        searchStatus.classList.toggle('no-match', visible === 0);
+      } else {
+        shelfLabel.textContent = 'All Titles';
+        searchStatus.textContent = '';
+        searchStatus.classList.remove('no-match');
+      }
+    }
+
+    searchInput.addEventListener('input', runSearch);
+    searchClear.addEventListener('click', () => { searchInput.value = ''; runSearch(); searchInput.focus(); });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === '/' && document.activeElement !== searchInput) {
+        e.preventDefault(); searchInput.focus(); searchInput.select();
+      }
+      if (e.key === 'Escape' && document.activeElement === searchInput) {
+        searchInput.value = ''; runSearch(); searchInput.blur();
+      }
+    });
+  </script>
+
+</body>
+</html>

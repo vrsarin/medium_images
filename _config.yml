@@ -1,13 +1,10 @@
 title: Tokens Are Not Free
 description: An essay on token economics, inference cost, and total cost of ownership for LLM deployments.
-url: ""
-baseurl: ""
-remote_theme: jekyll/minima
+url: "https://vrsarin.github.io"
+baseurl: "/medium_images"
 plugins:
-  - jekyll-remote-theme
   - jekyll-feed
 markdown: kramdown
 kramdown:
   input: GFM
-minima:
-  skin: classic
+  math_engine: null

@@ -1,6 +1,9 @@
 ---
 layout: default
-permalink: /
+title: "Tokens Are Not Free: How Every Token Generated Drives Real Operating Cost"
+description: "How every token generated drives real operating cost across compute, memory, energy, and cloud spend."
+date: 2025-03-15
+permalink: /tokens-are-not-free/
 ---
 
 # Tokens Are Not Free: How Every Token Generated Drives Real Operating Cost
@@ -70,7 +73,7 @@ However, the KV cache is not free. Its memory footprint scales with the number o
 
 ---
 
-![Diagram1](../images/diagram_03_12_2025.png)
+![Diagram1]({{ "/images/diagram_03_12_2025.png" | relative_url }})
 
 ## How Tokens Become OPEX
 

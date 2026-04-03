@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="official">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page.title | default: site.title }}</title>
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,500;1,7..72,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Carlito:ital,wght@0,400;0,700;1,400&family=Caladea:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}],
+      throwOnError: false
+    });"></script>
+  <style>
+    /* ── OpenDyslexic (free Kindle accessibility font) ── */
+    @font-face {
+      font-family: 'OpenDyslexic';
+      src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/dist/OpenDyslexic-Regular.woff2') format('woff2'),
+           url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/dist/OpenDyslexic-Regular.woff') format('woff');
+      font-weight: normal; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'OpenDyslexic';
+      src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/dist/OpenDyslexic-Italic.woff2') format('woff2'),
+           url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/dist/OpenDyslexic-Italic.woff') format('woff');
+      font-weight: normal; font-style: italic; font-display: swap;
+    }
+    @font-face {
+      font-family: 'OpenDyslexic';
+      src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/dist/OpenDyslexic-Bold.woff2') format('woff2'),
+           url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/dist/OpenDyslexic-Bold.woff') format('woff');
+      font-weight: bold; font-style: normal; font-display: swap;
+    }
+
+    /* ── Themes ─────────────────────────────────────
+       official : Navy + Ivory + Amber (default)
+       sepia    : warm cream  (Kindle)
+       day      : bright white
+       night    : dark
+    ──────────────────────────────────────────────── */
+    :root {
+      --font-size: 1.125rem;
+      --font-body: 'Literata', Georgia, serif;
+    }
+
+    [data-theme="official"] {
+      --bg:        #0f1b2d;
+      --surface:   #faf7f2;
+      --ink:       #1a1612;
+      --muted:     #6b6560;
+      --rule:      #e0d8cc;
+      --accent:    #c8780a;
+      --accent2:   #8b3a00;
+      --code-bg:   #f0e9df;
+      --code-fg:   #8b3a00;
+      --chrome-bg: #0f1b2d;
+      --chrome-border: rgba(200,120,10,0.25);
+    }
+
+    [data-theme="sepia"] {
+      --bg:        #f4ede0;
+      --surface:   #f4ede0;
+      --ink:       #2c1f0e;
+      --muted:     #8a7060;
+      --rule:      #d9ccb8;
+      --accent:    #8b4513;
+      --accent2:   #c8780a;
+      --code-bg:   #ede0cc;
+      --code-fg:   #5a2d0c;
+      --chrome-bg: #e8ddd0;
+      --chrome-border: #c8b89a;
+    }
+    [data-theme="day"] {
+      --bg:        #ffffff;
+      --surface:   #ffffff;
+      --ink:       #1a1a1a;
+      --muted:     #767676;
+      --rule:      #e5e5e5;
+      --accent:    #0f1b2d;
+      --accent2:   #c8780a;
+      --code-bg:   #f5f5f5;
+      --code-fg:   #8b3a00;
+      --chrome-bg: #f0f0f0;
+      --chrome-border: #ddd;
+    }
+    [data-theme="night"] {
+      --bg:        #1a1410;
+      --surface:   #1a1410;
+      --ink:       #d4c9b8;
+      --muted:     #7a6e60;
+      --rule:      #2e2820;
+      --accent:    #c8a060;
+      --accent2:   #c8780a;
+      --code-bg:   #241e18;
+      --code-fg:   #c8a060;
+      --chrome-bg: #141010;
+      --chrome-border: #2e2820;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      font-family: var(--font-body);
+      font-size: var(--font-size);
+      line-height: 1.9;
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Official theme — reader floats as ivory card on navy bg */
+    [data-theme="official"] .reader {
+      background: var(--surface);
+      border-radius: 0;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+      padding-top: 3rem;
+    }
+    [data-theme="official"] .article-meta {
+      background: var(--bg);
+      margin: 0 0 0;
+      padding: 2.5rem 1.5rem 2rem;
+      border-bottom: 3px solid var(--accent);
+      border-radius: 0;
+    }
+    [data-theme="official"] .article-meta h1 { color: #faf7f2; }
+    [data-theme="official"] .article-meta .meta-row { color: rgba(255,255,255,0.4); }
+    [data-theme="official"] .article-meta .meta-row a { color: var(--accent); }
+    [data-theme="official"] #topbar {
+      border-bottom-color: rgba(200,120,10,0.3);
+    }
+    [data-theme="official"] .ctrl-btn { color: rgba(255,255,255,0.4); }
+    [data-theme="official"] .ctrl-btn:hover { color: #faf7f2; background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); }
+    [data-theme="official"] .ctrl-btn.active { color: var(--accent); border-color: var(--accent); background: rgba(200,120,10,0.08); }
+    [data-theme="official"] .back-btn { color: var(--accent); }
+    [data-theme="official"] .topbar-title { color: rgba(255,255,255,0.3); }
+
+    /* ── Top bar ── */
+    #topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 48px;
+      background: var(--chrome-bg);
+      border-bottom: 1px solid var(--chrome-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      z-index: 200;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* Back button */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      background: none;
+      background-image: none;
+      border: none;
+      border-bottom: none;
+      padding: 0;
+      transition: opacity 0.2s;
+    }
+    .back-btn:hover { opacity: 0.65; background-image: none; background-size: unset; }
+
+    .topbar-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--muted);
+      max-width: 40vw;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Controls */
+    .topbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .ctrl-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      line-height: 1;
+    }
+    .ctrl-btn:hover {
+      color: var(--ink);
+      border-color: var(--rule);
+      background: var(--bg);
+    }
+    .ctrl-btn.active {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    .ctrl-sep {
+      width: 1px;
+      height: 18px;
+      background: var(--chrome-border);
+      margin: 0 0.25rem;
+    }
+
+    #font-picker {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--ink);
+      background: var(--bg);
+      border: 1px solid var(--chrome-border);
+      border-radius: 4px;
+      padding: 0.28rem 1.6rem 0.28rem 0.6rem;
+      cursor: pointer;
+      outline: none;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c8780a'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.45rem center;
+    }
+    #font-picker:hover, #font-picker:focus {
+      border-color: var(--accent);
+      color: var(--ink);
+    }
+    /* Per-theme dropdown background so native options are readable */
+    [data-theme="official"] #font-picker {
+      background: #1e2a3a;
+      color: #faf7f2;
+      border-color: rgba(200,120,10,0.4);
+    }
+    [data-theme="official"] #font-picker:hover { border-color: var(--accent); }
+    [data-theme="night"] #font-picker {
+      background: #241e18;
+      color: #d4c9b8;
+      border-color: #2e2820;
+    }
+    [data-theme="night"] #font-picker:hover { border-color: var(--accent); }
+
+    /* ── TOC drawer ── */
+    #toc-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    #toc-overlay.open { opacity: 1; pointer-events: all; }
+
+    #toc-drawer {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 280px;
+      background: var(--chrome-bg);
+      border-right: 1px solid var(--chrome-border);
+      z-index: 400;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    #toc-drawer.open { transform: translateX(0); }
+
+    .toc-header {
+      padding: 1.25rem 1.25rem 0.75rem;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .toc-header span {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .toc-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+      padding: 0.2rem;
+    }
+    .toc-close:hover { color: var(--ink); }
+
+    #toc-list {
+      list-style: none;
+      padding: 0.75rem 0;
+      margin: 0;
+      overflow-y: auto;
+      flex: 1;
+    }
+    #toc-list li::marker { content: none; }
+    #toc-list li a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 400;
+      color: var(--muted);
+      padding: 0.6rem 1.25rem;
+      text-decoration: none;
+      background-image: none;
+      border-bottom: none;
+      border-left: 3px solid transparent;
+      transition: color 0.15s, background 0.15s, border-color 0.15s;
+    }
+    #toc-list li a:hover {
+      color: var(--ink);
+      background: var(--bg);
+      background-image: none;
+      background-size: unset;
+    }
+    #toc-list li.active a {
+      color: var(--accent);
+      font-weight: 600;
+      border-left-color: var(--accent);
+      background: var(--bg);
+    }
+    #toc-list li a .toc-num {
+      font-size: 0.62rem;
+      color: var(--rule);
+      min-width: 1.2rem;
+      font-variant-numeric: tabular-nums;
+    }
+    #toc-list li.active a .toc-num { color: var(--accent2); }
+
+    /* ── Reading area ── */
+    .reader {
+      width: 72%;
+      margin: 0 auto;
+      padding: 5rem 1.5rem 6rem;
+    }
+
+    /* ── Article meta ── */
+    .article-meta {
+      text-align: center;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 3rem;
+    }
+    .article-meta .eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 1.25rem;
+    }
+    .article-meta h1 {
+      font-family: 'Lora', serif;
+      font-weight: 600;
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      line-height: 1.25;
+      color: var(--ink);
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+    .article-meta .meta-row {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .article-meta .meta-dot { opacity: 0.3; }
+    .article-meta .meta-row a {
+      color: var(--accent);
+      text-decoration: none;
+      background-image: none;
+      border-bottom: none;
+      font-weight: 500;
+    }
+    .article-meta .meta-row a:hover {
+      opacity: 0.7;
+      background-image: none;
+      background-size: unset;
+    }
+
+    /* ── Typography ── */
+    p { margin-bottom: 1.6rem; }
+
+    /* Drop cap */
+    .reader-body > p:first-of-type::first-letter {
+      font-family: 'Lora', serif;
+      font-weight: 600;
+      font-size: 4.2rem;
+      color: var(--accent);
+      float: left;
+      line-height: 0.75;
+      margin: 0.1em 0.1em 0 0;
+    }
+
+    h2, h3, h4 { margin-top: 3rem; margin-bottom: 0.9rem; }
+
+    h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--ink);
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    h3 {
+      font-family: 'Lora', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--ink);
+    }
+    h4 {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 2rem;
+    }
+
+    strong { color: var(--ink); font-weight: 700; }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--rule);
+      background-image: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a:hover {
+      border-bottom-color: var(--accent);
+      background-image: none;
+      background-size: unset;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8em;
+      background: var(--code-bg);
+      color: var(--code-fg);
+      padding: 0.1em 0.45em;
+      border-radius: 3px;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.75;
+      padding: 1.5rem 1.75rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 2rem 0;
+      border-left: 3px solid var(--accent2);
+    }
+    pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+
+    blockquote {
+      margin: 2.5rem 0;
+      padding: 0.25rem 0 0.25rem 2rem;
+      border-left: 3px solid var(--accent);
+      font-style: italic;
+      color: var(--muted);
+      font-size: 1.1rem;
+    }
+    blockquote p { margin-bottom: 0; }
+
+    .kdmath {
+      overflow-x: auto;
+      margin: 2rem 0;
+      padding: 1.25rem 1.5rem;
+      background: var(--code-bg);
+      border-radius: 4px;
+      border-left: 3px solid var(--accent2);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 2rem 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.88em;
+    }
+    th {
+      font-weight: 600;
+      font-size: 0.68em;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: 0.6rem 0.9rem;
+      text-align: left;
+      border-bottom: 2px solid var(--rule);
+    }
+    td {
+      padding: 0.6rem 0.9rem;
+      border-bottom: 1px solid var(--rule);
+      color: var(--ink);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+
+    ul, ol { padding-left: 1.6rem; margin-bottom: 1.6rem; }
+    li { margin-bottom: 0.35rem; }
+    li::marker { color: var(--accent2); font-weight: 700; }
+
+    img { max-width: 100%; display: block; margin: 2rem auto; border-radius: 3px; }
+
+    hr {
+      border: none;
+      text-align: center;
+      margin: 3.5rem 0;
+      color: var(--rule);
+      font-size: 0.75rem;
+      letter-spacing: 0.5em;
+    }
+    hr::after { content: '· · ·'; color: var(--accent2); opacity: 0.5; }
+
+    /* ── Kindle-style bottom bar ── */
+    #reader-footer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 36px;
+      background: var(--chrome-bg);
+      border-top: 1px solid var(--chrome-border);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      gap: 0;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    #reader-progress-track {
+      flex: 1;
+      height: 4px;
+      background: var(--rule);
+      border-radius: 2px;
+      cursor: pointer;
+      position: relative;
+      margin: 0 1rem;
+      transition: height 0.15s ease;
+      overflow: visible;
+    }
+    #reader-footer:hover #reader-progress-track { height: 10px; }
+    #reader-footer:hover #reader-progress-fill { height: 100%; }
+    #reader-footer:hover .sec-marker { height: 100%; }
+    #reader-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent2);
+      border-radius: 2px;
+      transition: width 0.08s linear;
+      pointer-events: none;
+    }
+    .sec-marker {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 2px;
+      height: 8px;
+      background: var(--muted);
+      opacity: 0.4;
+      cursor: pointer;
+      border-radius: 1px;
+    }
+    /* Invisible hit-area pad so a 2px sliver is easy to hover */
+    .sec-marker::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 36px;
+    }
+    .sec-marker.passed { opacity: 0.2; }
+    .sec-marker:hover { opacity: 1; background: var(--accent); }
+    /* Shared section tooltip — appended to <body> to escape stacking contexts */
+    #sec-tooltip {
+      position: fixed;
+      background: var(--accent);
+      color: var(--bg);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 600;
+      white-space: nowrap;
+      padding: 0.35em 0.8em;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      z-index: 9999;
+      transform: translateX(-50%);
+    }
+    #sec-tooltip.visible { opacity: 1; }
+
+    #reader-footer .foot-loc {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    #reader-footer .foot-pct {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--accent);
+      white-space: nowrap;
+      min-width: 2.5rem;
+      text-align: right;
+    }
+
+    /* ── Reset button ── */
+    .reset-btn {
+      font-size: 0.9rem;
+      opacity: 0.5;
+    }
+    .reset-btn:hover { opacity: 1; color: var(--accent) !important; }
+    [data-theme="official"] .reset-btn { color: rgba(255,255,255,0.4); }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .topbar-title { display: none; }
+      .reader { padding: 4.5rem 1rem 5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <nav id="topbar">
+    <div class="topbar-left">
+      <button type="button" class="ctrl-btn" id="toc-btn" title="Table of contents">☰</button>
+      <a class="back-btn" href="{{ '/' | relative_url }}">← Library</a>
+      <span class="ctrl-sep"></span>
+      <span class="topbar-title">{{ page.title | default: site.title }}</span>
+    </div>
+    <div class="topbar-controls">
+      <!-- Font size -->
+      <button type="button" class="ctrl-btn" id="font-dec" title="Smaller text">A−</button>
+      <button type="button" class="ctrl-btn" id="font-inc" title="Larger text">A+</button>
+      <span class="ctrl-sep"></span>
+      <!-- Font family (populated dynamically based on available fonts) -->
+      <select id="font-picker" title="Font family"></select>
+      <span class="ctrl-sep"></span>
+      <!-- Theme -->
+      <button type="button" class="ctrl-btn" id="theme-sepia" title="Sepia">Sepia</button>
+      <button type="button" class="ctrl-btn" id="theme-day" title="Day">Day</button>
+      <button type="button" class="ctrl-btn" id="theme-night" title="Night">Night</button>
+      <button type="button" class="ctrl-btn active" id="theme-official" title="Official">Official</button>
+      <span class="ctrl-sep"></span>
+      <button type="button" class="ctrl-btn reset-btn" id="reset-btn" title="Reset to defaults">↺</button>
+    </div>
+  </nav>
+
+  <!-- TOC drawer -->
+  <div id="toc-overlay"></div>
+  <aside id="toc-drawer">
+    <div class="toc-header">
+      <span>Contents</span>
+      <button type="button" class="toc-close" id="toc-close">✕</button>
+    </div>
+    <ul id="toc-list"></ul>
+  </aside>
+
+  <!-- Reading area -->
+  <main class="reader">
+    <div class="article-meta">
+      <div class="eyebrow">Technical Analysis</div>
+      <h1>{{ page.title | default: site.title }}</h1>
+      <div class="meta-row">
+        <a href="{{ '/' | relative_url }}">{{ site.title }}</a>
+        {% if page.date %}
+        <span class="meta-dot">·</span>
+        <span>{{ page.date | date: "%B %-d, %Y" }}</span>
+        {% endif %}
+        <span class="meta-dot">·</span>
+        <span id="read-time">— min read</span>
+      </div>
+    </div>
+    <div class="reader-body">
+      {{ content }}
+    </div>
+  </main>
+
+  <!-- Kindle-style footer -->
+  <div id="reader-footer">
+    <span class="foot-loc" id="foot-loc">Beginning</span>
+    <div id="reader-progress-track">
+      <div id="reader-progress-fill"></div>
+    </div>
+    <span class="foot-pct" id="foot-pct">0%</span>
+  </div>
+
+  <script>
+    const html    = document.documentElement;
+    const fill    = document.getElementById('reader-progress-fill');
+    const track   = document.getElementById('reader-progress-track');
+
+    // Shared tooltip for section markers — lives on <body> to avoid stacking context traps
+    const secTooltip = document.createElement('div');
+    secTooltip.id = 'sec-tooltip';
+    document.body.appendChild(secTooltip);
+    const footLoc = document.getElementById('foot-loc');
+    const footPct = document.getElementById('foot-pct');
+    const tocList = document.getElementById('toc-list');
+    const drawer  = document.getElementById('toc-drawer');
+    const overlay = document.getElementById('toc-overlay');
+
+    // ── Build TOC from h2s ──
+    const headings = document.querySelectorAll('.reader-body h2');
+    const docH = () => html.scrollHeight - html.clientHeight;
+
+    headings.forEach((h, i) => {
+      if (!h.id) h.id = 'sec-' + i;
+
+      // TOC item
+      const li = document.createElement('li');
+      const a  = document.createElement('a');
+      a.innerHTML = `<span class="toc-num">${i + 1}</span>${h.textContent.trim()}`;
+      a.href = '#' + h.id;
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        closeToc();
+      });
+      li.appendChild(a);
+      tocList.appendChild(li);
+
+      // Progress bar chapter marker
+      const positionMarker = () => {
+        const pct = (h.offsetTop - html.clientHeight * 0.2) / docH() * 100;
+        const m = document.createElement('div');
+        m.className = 'sec-marker';
+        m.style.left = Math.min(Math.max(pct, 0), 99) + '%';
+        const label = h.textContent.trim();
+        m.addEventListener('mouseenter', () => {
+          const rect = m.getBoundingClientRect();
+          secTooltip.textContent = label;
+          secTooltip.style.left  = (rect.left + rect.width / 2) + 'px';
+          secTooltip.style.top   = (rect.top - secTooltip.offsetHeight - 10) + 'px';
+          secTooltip.classList.add('visible');
+          // Reposition after text is set (offsetHeight now correct)
+          secTooltip.style.top = (rect.top - secTooltip.offsetHeight - 10) + 'px';
+        });
+        m.addEventListener('mouseleave', () => secTooltip.classList.remove('visible'));
+        m.addEventListener('click', () => h.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+        track.appendChild(m);
+      };
+      positionMarker();
+    });
+
+    // ── Click track to seek ──
+    track.addEventListener('click', e => {
+      if (e.target === track || e.target === fill) {
+        const pct = e.offsetX / track.offsetWidth;
+        window.scrollTo({ top: pct * docH(), behavior: 'smooth' });
+      }
+    });
+
+    // ── Hover on track — show cursor ──
+    track.style.cursor = 'pointer';
+
+    // ── Scroll handler ──
+    const tocItems  = tocList.querySelectorAll('li');
+    const markers   = track.querySelectorAll('.sec-marker');
+
+    window.addEventListener('scroll', () => {
+      const pct = html.scrollTop / docH() * 100;
+      fill.style.width = pct + '%';
+      footPct.textContent = Math.round(pct) + '%';
+
+      // Location label
+      let loc = 'Beginning';
+      headings.forEach(h => { if (h.getBoundingClientRect().top < 120) loc = h.textContent.trim(); });
+      footLoc.textContent = loc;
+
+      // Active section
+      let current = -1;
+      headings.forEach((h, i) => {
+        if (h.getBoundingClientRect().top <= 120) current = i;
+        if (markers[i]) markers[i].classList.toggle('passed', h.getBoundingClientRect().top <= 120);
+      });
+      tocItems.forEach((li, i) => li.classList.toggle('active', i === current));
+    });
+
+    // ── TOC drawer ──
+    const openToc  = () => { drawer.classList.add('open'); overlay.classList.add('open'); };
+    const closeToc = () => { drawer.classList.remove('open'); overlay.classList.remove('open'); };
+    document.getElementById('toc-btn').addEventListener('click', openToc);
+    document.getElementById('toc-close').addEventListener('click', closeToc);
+    overlay.addEventListener('click', closeToc);
+
+    // ── Font size ──
+    let fontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size')) || 1.125;
+    document.getElementById('font-inc').addEventListener('click', () => {
+      fontSize = Math.min(fontSize + 0.0625, 1.5);
+      document.documentElement.style.setProperty('--font-size', fontSize + 'rem');
+    });
+    document.getElementById('font-dec').addEventListener('click', () => {
+      fontSize = Math.max(fontSize - 0.0625, 0.875);
+      document.documentElement.style.setProperty('--font-size', fontSize + 'rem');
+    });
+
+    // ── Font family ──
+    const fontPicker = document.getElementById('font-picker');
+
+    // Fonts pre-loaded via the Google Fonts <link> tag or @font-face in <head>
+    const preloadedWebFonts = new Set([
+      'Literata','Lora','Merriweather','Playfair Display','Crimson Pro',
+      'EB Garamond','Libre Baskerville','Source Serif 4','Carlito','Caladea','Inter',
+      'OpenDyslexic',
+    ]);
+
+    // Curated Google Fonts catalog — loaded on demand when user selects them
+    const googleFontGroups = [
+      { label: 'Google — Serif', fonts: [
+        'Alegreya','Bitter','Bodoni Moda','Cardo','Cormorant Garamond',
+        'DM Serif Display','Domine','Faustina','Frank Ruhl Libre','Fraunces',
+        'Gelasio','Gentium Book Plus','IBM Plex Serif','Josefin Slab',
+        'Libre Caslon Text','Neuton','Noto Serif','Old Standard TT',
+        'Philosopher','Quattrocento','Roboto Slab','Rokkitt','Rufina',
+        'Spectral','Tinos','Vollkorn','Zilla Slab',
+      ]},
+      { label: 'Google — Sans-Serif', fonts: [
+        'DM Sans','Figtree','IBM Plex Sans','Jost','Karla','Manrope',
+        'Montserrat','Mulish','Nunito','Open Sans','Outfit',
+        'Plus Jakarta Sans','Poppins','Raleway','Roboto','Rubik','Work Sans',
+      ]},
+      { label: 'Google — Monospace', fonts: [
+        'DM Mono','Fira Code','IBM Plex Mono','Inconsolata',
+        'Roboto Mono','Source Code Pro','Space Mono',
+      ]},
+    ];
+    // Flat set of all on-demand Google Font names
+    const googleFontSet = new Set(googleFontGroups.flatMap(g => g.fonts));
+    // Tracks which Google Fonts have had their stylesheet injected
+    const loadedGoogleFonts = new Set([...preloadedWebFonts]);
+
+    const fontLabels = {
+      'Literata':      'Literata — Official',
+      'OpenDyslexic':  'OpenDyslexic (Kindle accessibility)',
+      'Bitter':        'Bitter (≈ Caecilia)',
+      'Carlito':       'Carlito (≈ Calibri)',
+      'Caladea':       'Caladea (≈ Cambria)',
+    };
+
+    // Inject a Google Fonts stylesheet for a single family on demand
+    function loadGoogleFont(family) {
+      if (loadedGoogleFonts.has(family)) return Promise.resolve();
+      loadedGoogleFonts.add(family);
+      return new Promise(resolve => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:ital,wght@0,400;0,700;1,400&display=swap`;
+        link.onload = resolve;
+        link.onerror = resolve; // resolve even on network error
+        document.head.appendChild(link);
+      });
+    }
+
+    const applyFont = async (name) => {
+      // Load from Google Fonts CDN if not yet fetched
+      if (googleFontSet.has(name) && !loadedGoogleFonts.has(name)) {
+        await loadGoogleFont(name);
+      }
+      // Web fonts (pre-loaded or on-demand Google) need a generic fallback
+      const isWebFont = preloadedWebFonts.has(name) || googleFontSet.has(name);
+      const stack = isWebFont ? `'${name}', Georgia, serif` : `'${name}'`;
+      document.documentElement.style.setProperty('--font-body', stack);
+      fontPicker.value = name;
+      localStorage.setItem('reader-font', name);
+    };
+    fontPicker.addEventListener('change', () => applyFont(fontPicker.value));
+
+    // Canvas probe — reliable detection for system fonts not loaded via @font-face
+    const canvasFontAvailable = (() => {
+      const c = document.createElement('canvas');
+      const ctx = c.getContext('2d');
+      const probe = 'mmmmmmmmmmlli';
+      ctx.font = '16px monospace';
+      const base = ctx.measureText(probe).width;
+      return (name) => {
+        ctx.font = `16px "${name}", monospace`;
+        return ctx.measureText(probe).width !== base;
+      };
+    })();
+
+    // Known system fonts to probe as fallback when Local Font Access API is unavailable
+    const knownSystemFonts = [
+      // Windows
+      'Arial','Arial Black','Bahnschrift','Calibri','Cambria','Candara',
+      'Comic Sans MS','Consolas','Constantia','Corbel','Courier New',
+      'Franklin Gothic Medium','Gabriola','Georgia','Impact','Lucida Console',
+      'Lucida Sans Unicode','Microsoft Sans Serif','MV Boli','Palatino Linotype',
+      'Segoe Print','Segoe Script','Segoe UI','Sylfaen','Tahoma',
+      'Times New Roman','Trebuchet MS','Verdana','Yu Gothic',
+      // macOS
+      'American Typewriter','Apple Chancery','Arial Narrow','Baskerville',
+      'Big Caslon','Bodoni 72','Bradley Hand','Brush Script MT','Chalkboard',
+      'Charter','Cochin','Copperplate','Courier','Didot','Futura','Geneva',
+      'Gill Sans','Helvetica','Helvetica Neue','Herculanum','Hoefler Text',
+      'Iowan Old Style','Lucida Grande','Luminari','Marion','Marker Felt',
+      'Menlo','Monaco','Noteworthy','Optima','Palatino','Papyrus',
+      'PT Mono','PT Sans','PT Sans Narrow','PT Serif','Rockwell','Skia',
+      'Snell Roundhand','Superclarendon','Times','Trattatello',
+      // Linux
+      'DejaVu Sans','DejaVu Serif','DejaVu Sans Mono',
+      'Liberation Sans','Liberation Serif','Liberation Mono',
+      'Ubuntu','Ubuntu Mono','Noto Sans','Noto Serif',
+      'FreeSans','FreeSerif','FreeMono','Droid Sans','Droid Serif',
+    ];
+
+    // All web font names (pre-loaded + catalog) — used to exclude from system font list
+    const allWebFontNames = new Set([...preloadedWebFonts, ...googleFontSet]);
+
+    (async () => {
+      await document.fonts.ready;
+
+      // ── 1. Pre-loaded web fonts (already in <link> tag) ──
+      const preloadedGroups = [
+        { label: 'E-Reader (Kindle)',  fonts: ['Literata','Lora','Merriweather','OpenDyslexic'] },
+        { label: 'Editorial',          fonts: ['Playfair Display','Crimson Pro','EB Garamond','Libre Baskerville','Source Serif 4'] },
+        { label: 'Web Alternatives',   fonts: ['Carlito','Caladea','Inter'] },
+      ];
+      preloadedGroups.forEach(({ label, fonts }) => {
+        const available = fonts.filter(f => document.fonts.check(`16px "${f}"`));
+        if (!available.length) return;
+        const g = document.createElement('optgroup');
+        g.label = label;
+        available.forEach(f => {
+          const o = document.createElement('option');
+          o.value = f; o.textContent = fontLabels[f] || f;
+          g.appendChild(o);
+        });
+        fontPicker.appendChild(g);
+      });
+
+      // ── 2. Google Fonts catalog (on-demand, always listed) ──
+      googleFontGroups.forEach(({ label, fonts }) => {
+        const g = document.createElement('optgroup');
+        g.label = label;
+        fonts.forEach(f => {
+          const o = document.createElement('option');
+          o.value = f; o.textContent = f;
+          g.appendChild(o);
+        });
+        fontPicker.appendChild(g);
+      });
+
+      // ── 3. System fonts ──
+      let sysFamilies = [];
+      if ('queryLocalFonts' in window) {
+        try {
+          const localFonts = await window.queryLocalFonts();
+          const seen = new Set();
+          localFonts.forEach(f => {
+            if (!seen.has(f.family) && !allWebFontNames.has(f.family)) {
+              seen.add(f.family); sysFamilies.push(f.family);
+            }
+          });
+          sysFamilies.sort();
+        } catch (_) {
+          sysFamilies = knownSystemFonts.filter(f => !allWebFontNames.has(f) && canvasFontAvailable(f)).sort();
+        }
+      } else {
+        sysFamilies = knownSystemFonts.filter(f => !allWebFontNames.has(f) && canvasFontAvailable(f)).sort();
+      }
+      if (sysFamilies.length) {
+        const g = document.createElement('optgroup');
+        g.label = 'System Fonts';
+        sysFamilies.forEach(f => {
+          const o = document.createElement('option');
+          o.value = f; o.textContent = f;
+          g.appendChild(o);
+        });
+        fontPicker.appendChild(g);
+      }
+
+      // ── 4. Restore saved preference ──
+      const savedFont = localStorage.getItem('reader-font') || 'Literata';
+      const opts = [...fontPicker.options];
+      applyFont(opts.some(o => o.value === savedFont) ? savedFont : (opts[0]?.value || 'Literata'));
+    })();
+
+    // ── Theme ──
+    const themes = ['official','sepia','day','night'];
+    const themeButtons = themes.map(t => document.getElementById('theme-' + t));
+    themes.forEach(t => {
+      document.getElementById('theme-' + t).addEventListener('click', () => {
+        html.setAttribute('data-theme', t);
+        themeButtons.forEach(b => b.classList.remove('active'));
+        document.getElementById('theme-' + t).classList.add('active');
+        localStorage.setItem('reader-theme', t);
+      });
+    });
+    // Restore saved theme, default to official
+    const saved = localStorage.getItem('reader-theme') || 'official';
+    html.setAttribute('data-theme', saved);
+    themeButtons.forEach(b => b.classList.remove('active'));
+    const savedBtn = document.getElementById('theme-' + saved);
+    if (savedBtn) savedBtn.classList.add('active');
+
+    // ── Reset to defaults ──
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      // Font size
+      fontSize = 1.125;
+      document.documentElement.style.setProperty('--font-size', '1.125rem');
+      localStorage.removeItem('reader-font-size');
+      // Font family
+      applyFont('Literata');
+      // Theme
+      html.setAttribute('data-theme', 'official');
+      themeButtons.forEach(b => b.classList.remove('active'));
+      document.getElementById('theme-official').classList.add('active');
+      localStorage.removeItem('reader-theme');
+    });
+
+    // ── Reading time ──
+    const words = document.querySelector('.reader-body').innerText.trim().split(/\s+/).length;
+    document.getElementById('read-time').textContent = Math.max(1, Math.round(words / 220)) + ' min read';
+  </script>
+</body>
+</html>
