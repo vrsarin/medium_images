@@ -455,7 +455,7 @@
     </div>
   </nav>
 
-  {% assign articles = site.pages | where_exp: "p", "p.layout == 'default' and p.title" | sort: "date" | reverse %}
+  {% assign articles = site.pages | where: "layout", "default" | where_exp: "p", "p.title" | sort: "date" | reverse %}
 
   <header class="lib-header">
     <div>
